@@ -22,8 +22,8 @@ const Line:React.FC<Props> = ({guess}) => {
 
   return (
     <div className="line">
-      {tiles.map((char) => {
-        return <div className="cell"> {char} </div>
+      {tiles.map((char, index) => {
+        return <div className="cell" key={"linediv" + index} > {char} </div>
       })}
     </div>
   )
