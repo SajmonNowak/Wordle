@@ -3,13 +3,29 @@ import Line from "./components/Line";
 
 const API_LINK = "/api/words";
 
-function App() {
-  const [solution, setSolution] = useState<String | null>(null);
-  const [wordList, setWordList] = useState<String[] | null>(null);
-  const [guesses, setGuesses] = useState<String[] | null[]>(new Array(6).fill(null));
-  const [currentGuess, setCurrentGuess] = useState("");
-  const [gameOver, setGameOver] = useState<String | Boolean>(false);
+const MESSAGES = {
+  NOTFOUND: "No word Found",
+}
 
+function App() {
+  const [solution, setSolution] = useState<string >("");
+  const [wordList, setWordList] = useState<string[] | null>(null);
+  const [guesses, setGuesses] = useState<(string | null)[]>(new Array(6).fill(null));
+  const [currentGuess, setCurrentGuess] = useState("");
+  const [gameOver, setGameOver] = useState<string | boolean>(false);
+  const [message, setMessage] = useState<string | null>(null)
+
+  const showMessage = (message: string) => {
+
+    setMessage(message);
+    resetMessageInterval()
+
+  }
+
+  const resetMessageInterval = () => {
+    setInterval( () => setMessage(null), 2000)
+  }
+  
   const checkIfSolution = (word: string) => {
     if (word === solution) return true;
   }
@@ -22,12 +38,25 @@ function App() {
     }
 
     if(wordList?.find((val) => word === val )){
-      setGameOver(true);
+      handleWordFound(currentGuess);
       return;
     }
 
-    showMessage("Not Found");
+    showMessage(MESSAGES.NOTFOUND);
   };
+
+  const handleWordFound = (word: string) => {
+     if(currentGuess === solution) setGameOver(true);
+      const newArray = guesses;
+      newArray[newArray.indexOf(null)] = word;
+      setGuesses(newArray);
+      resetCurrentGuess();
+     
+  }
+
+  const resetCurrentGuess = () => {
+    setCurrentGuess("");
+  }
 
   useEffect(() => {
     const fetchWordsAndSetSolution = async (API_Link: string) => {
@@ -41,6 +70,8 @@ function App() {
 
     fetchWordsAndSetSolution(API_LINK).catch((error) => console.log(error));
   }, []);
+
+  console.log(guesses)
 
   useEffect(() => {
 
@@ -67,7 +98,7 @@ function App() {
       window.removeEventListener("keydown", handleKeydown);
     }
 
-  }, [currentGuess])
+  }, [currentGuess, handleEnter])
 
   console.log(solution);
 
@@ -75,10 +106,12 @@ function App() {
     <div className="bord">
       {guesses.map((guess, index) => {
         const isCurrentGuess = index === guesses.findIndex(val => val == null); 
-        return <Line guess={isCurrentGuess ? currentGuess : guess}  key={"line" + index} />;
+        const isFound = guesses[index] !== null;
+        return <Line guess={isCurrentGuess ? currentGuess : guess} isFound={isFound} solution={solution} key={"line" + index} />;
       })}
       {gameOver && "You found the Word. Nice!"}
-    </div>
+      {message && <div className="message-div">{message}</div>}
+      </div>
   );
 }
 
