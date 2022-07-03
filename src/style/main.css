@@ -1,5 +1,14 @@
+.container{
+    width: 100vw;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .bord{
-    
+    margin-top: 10vh;
+    position: relative;
 }
 
 .line{
@@ -16,5 +25,50 @@
     justify-content: center;
     align-items: center;
     margin: 2px;
-    
+}
+
+.message-div{
+    font-weight: bold;
+    display: flex;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 50px;
+    position: absolute;
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: grey;
+    padding: 5px;
+    left: 50%;
+    margin-left: -75px;
+    top: 50%;
+    margin-top: -75px;
+}
+
+.keyboard{
+    margin-top: 50px;
+    width: calc(10 * 40px);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.keyboard__row{
+    display: flex;
+}
+
+.key{
+    width: 40px;
+    margin: 1px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+}
+
+.specialKey{
+    width: 60px;
 }

@@ -1,43 +1,51 @@
 import React, { useEffect, useState } from "react";
+import Keyboard from "./components/Keyboard";
 import Line from "./components/Line";
 
 const API_LINK = "/api/words";
 
 const MESSAGES = {
   NOTFOUND: "No word Found",
-}
+};
 
 function App() {
-  const [solution, setSolution] = useState<string >("");
+  const [solution, setSolution] = useState<string>("");
   const [wordList, setWordList] = useState<string[] | null>(null);
-  const [guesses, setGuesses] = useState<(string | null)[]>(new Array(6).fill(null));
+  const [guesses, setGuesses] = useState<(string | null)[]>(
+    new Array(6).fill(null)
+  );
   const [currentGuess, setCurrentGuess] = useState("");
   const [gameOver, setGameOver] = useState<string | boolean>(false);
-  const [message, setMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null);
 
   const showMessage = (message: string) => {
-
     setMessage(message);
-    resetMessageInterval()
-
-  }
+    resetMessageInterval();
+  };
 
   const resetMessageInterval = () => {
-    setInterval( () => setMessage(null), 2000)
-  }
-  
+    setInterval(() => setMessage(null), 2000);
+  };
+
   const checkIfSolution = (word: string) => {
     if (word === solution) return true;
-  }
+  };
+
+  const handleWordFound = (word: string) => {
+    if (currentGuess === solution) setGameOver(true);
+    const newArray = guesses;
+    newArray[newArray.indexOf(null)] = word;
+    setGuesses(newArray);
+    resetCurrentGuess();
+  };
 
   const handleEnter = (word: string) => {
-
-    if (checkIfSolution(word)){
+    if (checkIfSolution(word)) {
       setGameOver(true);
       return;
     }
 
-    if(wordList?.find((val) => word === val )){
+    if (wordList?.find((val) => word === val)) {
       handleWordFound(currentGuess);
       return;
     }
@@ -45,18 +53,9 @@ function App() {
     showMessage(MESSAGES.NOTFOUND);
   };
 
-  const handleWordFound = (word: string) => {
-     if(currentGuess === solution) setGameOver(true);
-      const newArray = guesses;
-      newArray[newArray.indexOf(null)] = word;
-      setGuesses(newArray);
-      resetCurrentGuess();
-     
-  }
-
   const resetCurrentGuess = () => {
     setCurrentGuess("");
-  }
+  };
 
   useEffect(() => {
     const fetchWordsAndSetSolution = async (API_Link: string) => {
@@ -71,47 +70,51 @@ function App() {
     fetchWordsAndSetSolution(API_LINK).catch((error) => console.log(error));
   }, []);
 
-  console.log(guesses)
-
   useEffect(() => {
-
     const handleKeydown = (e: KeyboardEvent) => {
-
-      if(e.key === "Enter" && currentGuess.length === 5 ){
+      if (e.key === "Enter" && currentGuess.length === 5) {
         handleEnter(currentGuess);
       }
 
-      if (e.key === "Backspace"){
-        setCurrentGuess(currentGuess.slice(0, -1))
+      if (e.key === "Backspace") {
+        setCurrentGuess(currentGuess.slice(0, -1));
       }
 
-      if(!e.key.match(/^[a-z]$/i)) return;
+      if (!e.key.match(/^[a-z]$/i)) return;
 
-      if (currentGuess.length < 5){
+      if (currentGuess.length < 5) {
         setCurrentGuess(currentGuess + e.key.toUpperCase());
-    }
-  }
+      }
+    };
 
     window.addEventListener("keydown", handleKeydown);
 
     return () => {
       window.removeEventListener("keydown", handleKeydown);
-    }
-
-  }, [currentGuess, handleEnter])
-
-  console.log(solution);
+    };
+  }, [currentGuess]);
 
   return (
-    <div className="bord">
-      {guesses.map((guess, index) => {
-        const isCurrentGuess = index === guesses.findIndex(val => val == null); 
-        const isFound = guesses[index] !== null;
-        return <Line guess={isCurrentGuess ? currentGuess : guess} isFound={isFound} solution={solution} key={"line" + index} />;
-      })}
-      {gameOver && "You found the Word. Nice!"}
-      {message && <div className="message-div">{message}</div>}
+    <div className="container">
+      <div className="bord">
+        {guesses.map((guess, index) => {
+          const isCurrentGuess =
+            index === guesses.findIndex((val) => val == null);
+          const isFound = guesses[index] !== null;
+          return (
+            <Line
+              guess={isCurrentGuess ? currentGuess : guess}
+              isFound={isFound}
+              solution={solution}
+              key={"line" + index}
+            />
+          );
+        })}
+        {gameOver && "You found the Word. Nice!"}
+        {message && <div className="message-div">{message}</div>}
       </div>
+      <Keyboard guesses={guesses} solution={solution}/>
+    </div>
   );
 }
 
