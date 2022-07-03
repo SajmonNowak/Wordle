@@ -24,24 +24,17 @@ const Keyboard:React.FC<Props> = ({guesses, solution}) => {
           chars[char] = "yellow"
           return
         }
+        chars[char] = "grey";
     })
   })
 
   const selectColor = (char: string) => {
-    let color = "lightgrey"
     
-    switch(true){
-      case chars[char] === "green":
-      color = "green";
-      break;
-      case chars[char] === "yellow":
-      color = "yellow";
-      break;
-      default:
-      color = "lightgrey"
+    if (chars[char]){
+      return chars[char]
     }
-
-    return color;
+  
+    return "lightgrey";
   }
 
   return (
